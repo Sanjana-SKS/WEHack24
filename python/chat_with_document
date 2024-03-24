@@ -1,21 +1,27 @@
 from dotenv import load_dotenv
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.embeddings import OpenAIEmbeddings
-# FAISS runs locally saves the embeddings on the local machine.
 from langchain.vectorstores import FAISS
 from langchain.chat_models import ChatOpenAI
 from langchain.memory import ConversationBufferMemory
 from langchain.chains import ConversationalRetrievalChain
-from web_scrapper import webScrapper
 import openai
 import os
+import PyPDF2  # Library to extract text from PDF
 
 load_dotenv()
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 # Function to return chunks of data from the extracted pdf data.
-def get_text_chunks(text):
+def get_text_chunks_from_pdf(pdf_path):
+    text = ""
+    with open(pdf_path, "rb") as file:
+        pdf_reader = PyPDF2.PdfFileReader(file)
+        num_pages = pdf_reader.numPages
+        for page_num in range(num_pages):
+            page = pdf_reader.getPage(page_num)
+            text += page.extractText()
     text_splitter = CharacterTextSplitter(
         separator="\n",
         chunk_size=1000,
@@ -43,10 +49,8 @@ def get_conversation_chain(vectorstore):
     )
     return conversation_chain
 
-
-def VectorizationURL(url):
-    raw_text = webScrapper(url)
-    text_chunks = get_text_chunks(raw_text)
+def VectorizationPDF(pdf_path):
+    text_chunks = get_text_chunks_from_pdf(pdf_path)
     vectorstore = get_vectorstore(text_chunks)
     conversation = get_conversation_chain(vectorstore)
     return conversation
@@ -58,4 +62,4 @@ def ChatDocument(conversation, user_question):
         if i % 2 == 0:
             pass
         else:
-            return message.content                                                               
+            return message.content
