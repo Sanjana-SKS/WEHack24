@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from Text_summarization import Summarization
-from Chat_with_document import VectorizationPDF, ChatDocument  # Updated import
+'''from Text_summarization import Summarization'''
+from chat_with_document import VectorizationPDF, ChatDocument  # Updated import
 import os
 
 app = Flask(__name__)
@@ -11,11 +11,11 @@ CORS(app)
 def members():
     return {"members": ["Member1", "Member2", "Member3"]}
 
-@app.route("/summarize", methods=['POST'])
+'''@app.route("/summarize", methods=['POST'])
 def summarize():
     data = request.get_json()
     para = data.get('para')
-    return jsonify({"response": Summarization(para)})  # return the summarize function here.
+    return jsonify({"response": Summarization(para)})  # return the summarize function here.'''
 
 @app.route("/docchat", methods=['POST'])
 def document_chat():
